@@ -5,7 +5,7 @@
 #define PACKAGE "osplan"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "you@example.com"
+#define PACKAGE_BUGREPORT "oakymacintosh@duck.com"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "osplan"

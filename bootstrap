@@ -5,45 +5,49 @@ set -e
 
 ARCH="${1:-x86_64-elf}"
 PREFIX="$(pwd)/build/xgcc/$ARCH"
-GCC_DIR="components/gcc"
+TCC_DIR="tcc"
 BUILD_DIR="build/gcc-build-$ARCH"
-TARGET="$ARCH"
+TARGETS="$ARCH"
 NCPU=$(getconf _NPROCESSORS_ONLN)
 
 echo "[OSPLAN] Bootstrapping GCC for $ARCH..."
 
 # Check dependencies
+command -v git >/dev/null || { echo "git is required."; exit 1; }
+command -v autoconf >/dev/null || { echo "autoconf is required."; exit 1; }
+command -v automake >/dev/null || { echo "automake is required."; exit 1; }
+command -v libtool >/dev/null || { echo "libtool is required."; exit 1; }
+command -v patch >/dev/null || { echo "patch is required."; exit 1; }
+command -v tar >/dev/null || { echo "tar is required."; exit 1; }
+command -v makeinfo >/dev/null || { echo "makeinfo is required."; exit 1; }
+command -v bison >/dev/null || { echo "bison is required."; exit 1; }
+command -v flex >/dev/null || { echo "flex is required."; exit 1; }
+command -v gperf >/dev/null || { echo "gperf is required."; exit 1; }
+command -v gawk >/dev/null || { echo "gawk is required."; exit 1; }
 command -v make >/dev/null || { echo "make is required."; exit 1; }
 command -v gcc >/dev/null || { echo "gcc is required."; exit 1; }
 
-# Step 1: Make sure GCC source exists
-if [ ! -d "$GCC_DIR" ]; then
-    echo "[ERROR] GCC source not found at $GCC_DIR"
-    echo "Run: git submodule update --init --recursive"
+# reconfigure with autotools
+autoreconf -i
+
+# build libtcc.a from ./tcc/
+if [ -d "tcc" ]; then
+    echo "[OSPLAN] Building libtcc.a..."
+    cd tcc
+    ./configure --prefix="$PREFIX" --disable-shared --enable-static
+    make -j"$NCPU"
+    make install
+    cd ..
+else
+    echo "[OSPLAN] Warning: tcc directory not found."
     exit 1
 fi
 
-# Step 2: Configure
-mkdir -p "$BUILD_DIR"
-cd "$BUILD_DIR"
+targets=(arm-linux-gnueabi mipsel-linux-gnu x86_64-w64-mingw32 sparc64-linux-gnu powerpc64le-linux-gnu powerpc-elf riscv64-unknown-linux-gnu aarch64-elf 
+          i686-elf x86_64-elf arm-elf sparc-elf mips-elf)
 
-"$GCC_DIR"/configure \
-  --target="$TARGET" \
-  --prefix="$PREFIX" \
-  --disable-nls \
-  --enable-languages=c \
-  --without-headers \
-  --disable-shared \
-  --disable-multilib \
-  --disable-threads \
-  --disable-libssp \
-  --disable-libquadmath \
-  --disable-libmudflap \
-  --with-newlib \
-  --enable-static
-
-# Step 3: Build
-make all-gcc -j"$NCPU"
-make install-gcc
-
-echo "[OSPLAN] xgcc built at: $PREFIX/bin/$TARGET-gcc"
+for tgt in "${targets[@]}"; do
+  make clean
+  make TARGET=$tgt
+  mv tcc tcc-$tgt
+done

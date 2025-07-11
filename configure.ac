@@ -1,4 +1,4 @@
-AC_INIT([osplan], [0.1], [you@example.com])
+AC_INIT([osplan], [0.1], [oakymacintosh@duck.com])
 AC_CONFIG_SRCDIR([osplan/src/osplan.c])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
