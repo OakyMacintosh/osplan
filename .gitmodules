@@ -7,6 +7,8 @@
 [submodule "osplan/EFI/components/gcc"]
     path = osplan/EFI/components/gcc
 	url = https://github.com/gcc-mirror/gcc.git
-	[submodule "components/gcc"]
-    path = components/gcc
+
+
+	[submodule "gcc"]
+    path = gcc
     url = https://github.com/gcc-mirror/gcc.git

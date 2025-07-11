@@ -68,3 +68,10 @@ osplan-*.img.*
 *.xz
 *.zip
 *.gz
+
+# === Autotools Files ===
+Makefile.in
+config.status
+config.log
+autom4te.cache/
+*.deps/
