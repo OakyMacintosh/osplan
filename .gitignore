@@ -43,9 +43,9 @@ obj/
 bash_history
 
 # === AUR/Makepkg Output ===
-*.pkg.tar.*
-src/
-pkg/
+# *.pkg.tar.*
+# src/
+# pkg/
 
 # === BusyBox & Submodules ===
 components/busybox/.config.old
