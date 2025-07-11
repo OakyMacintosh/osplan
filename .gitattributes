@@ -1,0 +1,18 @@
+# Treat GCC as a component, ignore its bulk during archive/export
+components/gcc/* export-ignore
+components/gcc/gcc/** !export-ignore
+components/gcc/libcpp/** !export-ignore
+components/gcc/config/** !export-ignore
+
+# Optional: mark OSPLAN core code as text and normalize line endings
+*.c text eol=lf
+*.h text eol=lf
+*.sh text eol=lf
+
+# Scripts and install plans
+*.osplan text
+*.oscc text
+
+# Binary image outputs
+*.bin binary
+*.img binary

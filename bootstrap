@@ -1,0 +1,49 @@
+#!/bin/sh
+# OSPLAN Bootstrap Script for xGCC (static cross-compiler)
+
+set -e
+
+ARCH="${1:-x86_64-elf}"
+PREFIX="$(pwd)/build/xgcc/$ARCH"
+GCC_DIR="components/gcc"
+BUILD_DIR="build/gcc-build-$ARCH"
+TARGET="$ARCH"
+NCPU=$(getconf _NPROCESSORS_ONLN)
+
+echo "[OSPLAN] Bootstrapping GCC for $ARCH..."
+
+# Check dependencies
+command -v make >/dev/null || { echo "make is required."; exit 1; }
+command -v gcc >/dev/null || { echo "gcc is required."; exit 1; }
+
+# Step 1: Make sure GCC source exists
+if [ ! -d "$GCC_DIR" ]; then
+    echo "[ERROR] GCC source not found at $GCC_DIR"
+    echo "Run: git submodule update --init --recursive"
+    exit 1
+fi
+
+# Step 2: Configure
+mkdir -p "$BUILD_DIR"
+cd "$BUILD_DIR"
+
+"$GCC_DIR"/configure \
+  --target="$TARGET" \
+  --prefix="$PREFIX" \
+  --disable-nls \
+  --enable-languages=c \
+  --without-headers \
+  --disable-shared \
+  --disable-multilib \
+  --disable-threads \
+  --disable-libssp \
+  --disable-libquadmath \
+  --disable-libmudflap \
+  --with-newlib \
+  --enable-static
+
+# Step 3: Build
+make all-gcc -j"$NCPU"
+make install-gcc
+
+echo "[OSPLAN] xgcc built at: $PREFIX/bin/$TARGET-gcc"

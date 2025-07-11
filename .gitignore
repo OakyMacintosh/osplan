@@ -1,0 +1,70 @@
+# === Compiled Binaries ===
+*.elf
+*.bin
+*.img
+*.o
+*.out
+*.iso
+
+# === Build Directories ===
+build/
+dist/
+obj/
+
+# === Logs & Debug ===
+*.log
+*.map
+*.lst
+*.sym
+
+# === GCC/Make Artifacts ===
+*.d
+*.dSYM/
+*.dep
+*.mod
+*.a
+*.so
+*.ld
+
+# === Editor Files ===
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
+*.old
+
+# === VSCode / JetBrains ===
+.vscode/
+.idea/
+
+# === Shell History ===
+.history
+bash_history
+
+# === AUR/Makepkg Output ===
+*.pkg.tar.*
+src/
+pkg/
+
+# === BusyBox & Submodules ===
+components/busybox/.config.old
+components/busybox/busybox
+components/busybox/_install/
+components/*/build/
+
+# === OSPLAN-specific ===
+osplan-*.img.*
+*.xcd
+*.rom
+*.cdr
+*.dmg
+*.mount
+*.plan
+
+# === Misc ===
+*.tar
+*.tar.*
+*.xz
+*.zip
+*.gz

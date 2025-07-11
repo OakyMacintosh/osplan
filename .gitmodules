@@ -1,0 +1,12 @@
+[submodule "osplan/EFI/components/busybox"]
+    path = osplan/EFI/components/busybox
+	url = https://github.com/mirror/busybox.git
+[submodule "osplan/EFI/components/dash"]
+    path = osplan/EFI/components/dash
+	url = https://git.kernel.org/pub/scm/utils/dash/dash.git
+[submodule "osplan/EFI/components/gcc"]
+    path = osplan/EFI/components/gcc
+	url = https://github.com/gcc-mirror/gcc.git
+	[submodule "components/gcc"]
+    path = components/gcc
+    url = https://github.com/gcc-mirror/gcc.git
