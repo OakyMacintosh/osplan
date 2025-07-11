@@ -4,14 +4,9 @@
 [submodule "osplan/EFI/components/dash"]
     path = osplan/EFI/components/dash
 	url = https://git.kernel.org/pub/scm/utils/dash/dash.git
-[submodule "osplan/EFI/components/gcc"]
-    path = osplan/EFI/components/gcc
-	url = https://github.com/gcc-mirror/gcc.git
-
-
-	[submodule "gcc"]
-    path = gcc
-    url = https://github.com/gcc-mirror/gcc.git
 [submodule "tcc"]
 	path = tcc
 	url = https://repo.or.cz/tinycc.git
+[submodule "external/musl"]
+	path = external/musl
+	url = https://github.com/ifduyue/musl.git
