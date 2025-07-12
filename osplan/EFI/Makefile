@@ -1,59 +1,32 @@
-# === CONFIG ===
-ARCH       := i586
-CROSS      := $(ARCH)-elf-
-CC         := $(CROSS)gcc
-LD         := $(CROSS)ld
-AS         := nasm
-OBJCOPY    := $(CROSS)objcopy
-QEMU       := qemu-system-i386
+CC=i686-elf-gcc
+CFLAGS=-m16 -ffreestanding -nostdlib -Wno-nonnull
 
-BOOTLOADER := miniboot86.asm
-INIT_SRC   := userland.c
-LINKER     := userland.ld
-INIT_BIN   := init.elf
-IMG        := miniboot86.img
+UTIL_SRC := $(wildcard ../../modules/coreutils86/*.c)
+UTIL_BIN := $(patsubst ../../modules/coreutils86/%.c, %.bin, $(UTIL_SRC))
 
-BUSYBOX_DIR   := components/busybox
-BUSYBOX_BUILD := build/busybox
-BUSYBOX_ELF   := sh.elf
+BOOT86VERSION := 0.1.0
 
-MODULES_ADDR := 0x8000
+all: shell.bin $(UTIL_BIN) miniboot86-$(BOOT86VERSION).iso
 
-# === DEFAULT ===
-all: $(IMG)
+%.bin: ../../modules/coreutils86/%.c
+	$(CC) $(CFLAGS) -o $@ -Ttext=0x100000 -Wl,--oformat=elf32-i386 $<
 
-# === BOOTLOADER ===
-bootloader.bin: $(BOOTLOADER)
-	$(AS) -f bin $< -o $@
+shell.bin: shell.c
+	$(CC) $(CFLAGS) -o shell.bin -Ttext=0x100000 -Wl,--oformat=elf32-i386 shell.c
 
-# === INIT ELF (userland.c) ===
-$(INIT_BIN): $(INIT_SRC) $(LINKER)
-	$(CC) -m32 -ffreestanding -nostdlib -Wl,-T,$(LINKER) -o $@ $<
+miniboot86.iso: shell.bin $(UTIL_BIN)
+	rm -rf iso
+	mkdir -p iso/boot/grub
+	cp shell.bin iso/boot/
+	cp $(UTIL_BIN) iso/boot/
+	echo 'set timeout=0' > iso/boot/grub/grub.cfg
+	echo 'set default=0' >> iso/boot/grub/grub.cfg
+	echo 'menuentry "Miniboot86 i686" {' >> iso/boot/grub/grub.cfg
+	echo '  multiboot /boot/shell.bin' >> iso/boot/grub/grub.cfg
+	echo '  boot' >> iso/boot/grub/grub.cfg
+	echo '}' >> iso/boot/grub/grub.cfg
+	grub-mkrescue -o miniboot86.iso iso
 
-# === BUSYBOX SHELL (sh.elf) ===
-$(BUSYBOX_ELF):
-	mkdir -p $(BUSYBOX_BUILD)
-	cp $(BUSYBOX_DIR)/.config $(BUSYBOX_BUILD)/.config || true
-	cd $(BUSYBOX_DIR) && \
-		make O=$(abspath $(BUSYBOX_BUILD)) \
-		CROSS_COMPILE=$(CROSS) \
-		CC=$(CC) \
-		defconfig
-	cd $(BUSYBOX_BUILD) && make -j4
-	cp $(BUSYBOX_BUILD)/busybox $@
-
-# === FINAL BOOTABLE IMAGE ===
-$(IMG): bootloader.bin $(INIT_BIN) $(BUSYBOX_ELF)
-	cat bootloader.bin > $(IMG)
-	cat $(INIT_BIN) >> $(IMG)
-	dd if=$(BUSYBOX_ELF) of=$(IMG) bs=512 seek=20 conv=notrunc status=none
-	truncate -s 1474560 $(IMG)
-
-# === TEST IN QEMU ===
-run: $(IMG)
-	$(QEMU) -fda $(IMG) -boot a
-
-# === CLEAN ===
 clean:
-	rm -f *.bin *.elf *.img
-	rm -rf $(BUSYBOX_BUILD)
+	rm -f *.bin shell.bin miniboot86.iso
+	rm -rf iso
