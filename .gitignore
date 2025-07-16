@@ -68,6 +68,7 @@ osplan-*.img.*
 *.xz
 *.zip
 *.gz
+build/
 
 # === Autotools Files ===
 Makefile.in
@@ -75,3 +76,10 @@ config.status
 config.log
 autom4te.cache/
 *.deps/
+
+# === CMake Files ===
+CMakeCache.txt
+CMakeFiles/
+CTestTestfile.cmake
+cmake_install.cmake
+
